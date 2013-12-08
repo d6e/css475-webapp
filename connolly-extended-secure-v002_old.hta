@@ -100,7 +100,7 @@
 			{
 				// Access 2007 and Later
 				var strConnection = "Provider=Microsoft.ACE.OLEDB.12.0;Data Source=" + getPath() + "connolly-extended.mdb";
-				// var strConnection = "Provider=Microsoft.ACE.OLEDB.12.0;Data Source=" + getPath() + "shawjenkins.accdb"; //switch
+				// var strConnection = "Provider=Microsoft.ACE.OLEDB.12.0;Data Source=" + getPath() + "shawjenkins.mdb"; //switch
 				
 				// Access 2003 and Earlier
 				// var strConnection = "Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" + getPath() + "connolly-extended.mdb";
@@ -189,8 +189,8 @@
 			function showHotel(strID)
 			{
 				// Access 2007 and Later
-				var strConnection = "Provider=Microsoft.ACE.OLEDB.12.0;Data Source=" + getPath() + "shawjenkins.accdb";
-				// var strConnection = "Provider=Microsoft.ACE.OLEDB.12.0;Data Source=" + getPath() + "connolly-extended.mdb"; //switch
+				// var strConnection = "Provider=Microsoft.ACE.OLEDB.12.0;Data Source=" + getPath() + "shawjenkins.mdb";
+				var strConnection = "Provider=Microsoft.ACE.OLEDB.12.0;Data Source=" + getPath() + "connolly-extended.mdb"; //switch
 				
 				// Access 2003 and Earlier
 				// var strConnection = "Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" + getPath() + "connolly-extended.mdb";
@@ -200,8 +200,7 @@
 				oConnection.Open(strConnection);
 				
 				// Execute a Read Only Query
-				// var rsQuery = oConnection.Execute("SELECT * FROM Hotel ORDER BY hotelName,city");
-				var rsQuery = oConnection.Execute("SELECT Style, Color, ModelType, MakeType, Timedate FROM (Incident INNER JOIN VehicleIncident ON Incident.IncidentID = VehicleIncident.IncidentID) INNER JOIN Vehicle ON VehicleIncident.VehicleID = Vehicle.VehicleID");
+				var rsQuery = oConnection.Execute("SELECT * FROM Hotel ORDER BY hotelName,city");
 				
 				// Generate HTML Table with Query Results
 				var strHTML = new String();
@@ -209,12 +208,9 @@
 				while (!rsQuery.EOF)
 				{
 					// Note: This Code Adds a Link to Display One Hotel
-					strHTML += "<tr><td><a href=\"#\" onclick=\"showOneHotelSecure(" + rsQuery("ModelType") + ");\">" +
-						rsQuery("Color") + "</a></td><td>" +
-						rsQuery("Style") + "</a></td><td>" +
-						rsQuery("ModelType") + "</a></td><td>" +
-						rsQuery("MakeType") + "</a></td><td>" +
-						rsQuery("Timedate") + "</td></tr>";
+					strHTML += "<tr><td><a href=\"#\" onclick=\"showOneHotelSecure(" + rsQuery("hotelNo") + ");\">" +
+						rsQuery("hotelName") + "</a></td><td>" +
+						rsQuery("city") + "</td></tr>";
 					rsQuery.MoveNext();
 				}
 				strHTML += "</table>";
@@ -233,11 +229,11 @@
 			 
 			  @param (string) strHotelNo The unique Hotel Number of one Hotel
 			 */
-			function showOneHotelSecure(strModelType)
+			function showOneHotelSecure(strHotelNumber)
 			{
 				// Access 2007 and Later
-				// var strConnection = "Provider=Microsoft.ACE.OLEDB.12.0;Data Source=" + getPath() + "connolly-extended.mdb";
-				var strConnection = "Provider=Microsoft.ACE.OLEDB.12.0;Data Source=" + getPath() + "shawjenkins.accdb";
+				var strConnection = "Provider=Microsoft.ACE.OLEDB.12.0;Data Source=" + getPath() + "connolly-extended.mdb";
+				// var strConnection = "Provider=Microsoft.ACE.OLEDB.12.0;Data Source=" + getPath() + "shawjenkins.mdb";
 				
 				// Access 2003 and Earlier
 				// var strConnection = "Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" + getPath() + "connolly-extended.mdb";
@@ -248,15 +244,14 @@
 				
 				// Create SQL Statement String
 				var strSQL = new String();
-				// strSQL = "SELECT * FROM Vehicle WHERE ModelType=[IDParameter]ORDER BY Timedate";
-				strSQL = "SELECT * FROM Vehicle WHERE ModelType=[IDParameter]";
+				strSQL = "SELECT * FROM Hotel WHERE HotelNo=[IDParameter]ORDER BY hotelName";
 				
 				// Prepare Parameterized Command
 				var oCommand = new ActiveXObject("ADODB.Command");
 				oCommand.ActiveConnection = oConnection;
 				oCommand.CommandText = strSQL;
 				var parm1 = oCommand.CreateParameter("IDParameter",200,1,50);
-				parm1.Value = strModelType;
+				parm1.Value = strHotelNumber;
 				oCommand.Parameters.Append(parm1);
 				
 				// Execute Command and Return Resulting Record Set
@@ -267,13 +262,9 @@
 				strHTML += "<table width=\"100%\">"
 				while (!rsQuery.EOF)
 				{
-					strHTML += "<tr><td colspan=\"2\">Vehicle Found!</td></tr>";
-					strHTML += "<tr><td>" + rsQuery("ModelType") + "</td><td>" +
-						rsQuery("Color") + "</td></tr>";
-						rsQuery("Style") + "</td></tr>" +
-						rsQuery("ModelType") + "</td></tr>" +
-						rsQuery("MakeType") + "</td></tr>" +
-						rsQuery("Timedate") + "</td></tr>";
+					strHTML += "<tr><td colspan=\"2\">Hotel Found!</td></tr>";
+					strHTML += "<tr><td>" + rsQuery("hotelName") + "</td><td>" +
+						rsQuery("city") + "</td></tr>";
 					rsQuery.MoveNext();
 				}
 				strHTML += "</table>";

@@ -1,0 +1,56 @@
+AlcoholRelatedVehicleIncidents
+
+SELECT Timedate, AlcoholRelated, ZipCode, StreetAddress, City, StateCode
+FROM (VehicleIncident INNER JOIN Incident ON Incident.IncidentID = VehicleIncident.IncidentID) INNER JOIN Location ON Incident.LocationID = Location.LocationID;
+
+
+
+BubbaBojanglesIncidentReport
+
+SELECT *
+FROM (((Incident INNER JOIN WitnessIncident ON WitnessIncident.IncidentID = Incident.IncidentID) INNER JOIN Witness ON Witness.WitnessID = WitnessIncident.WitnessID) INNER JOIN Location ON Location.LocationID = Incident.LocationID) INNER JOIN LegalEntity ON LegalEntity.SIN = Witness.SIN
+WHERE FirstName = "Bubba";
+
+
+
+DrugAlcoholIncidentStatsPerLocation
+
+SELECT StateCode, Timedate, AlcoholRelated, DrugRelated
+FROM Incident INNER JOIN Location ON Location.LocationID = Incident.LocationID;
+
+
+
+DrugRelatedIncidentsByYear
+
+SELECT Timedate, DrugRelated
+FROM Incident
+ORDER BY Timedate;
+
+
+
+EmergencyResponderReports
+
+SELECT *
+FROM (((LegalEntity INNER JOIN EmerResponder ON EmerResponder.SIN = LegalEntity.SIN) INNER JOIN EmerResponderReport ON EmerResponderReport.ResponderID = EmerResponder.ResponderID) INNER JOIN Report ON EmerResponderReport.ReportID = Report.ReportID) INNER JOIN Incident ON Incident.IncidentID = Report.IncidentID;
+
+
+
+VehiclesInvolvedInIncidents
+
+SELECT Style, Color, ModelType, MakeType, Timedate
+FROM (Incident INNER JOIN VehicleIncident ON Incident.IncidentID = VehicleIncident.IncidentID) INNER JOIN Vehicle ON VehicleIncident.VehicleID = Vehicle.VehicleID;
+
+
+
+VictimBenefitApplication
+
+SELECT FirstName, LastName, SSN, City, StreetAddress, StateCode, ZipCode
+FROM (Victim INNER JOIN LegalEntity ON LegalEntity.SIN = Victim.SIN) INNER JOIN Location ON Location.LocationID = LegalEntity.LocationID
+WHERE FirstName = "Adrian";
+
+
+
+WitnessSummonsQuery
+
+SELECT FirstName, LastName, StreetAddress, ZipCode, City, StateCode
+FROM (Witness INNER JOIN LegalEntity ON LegalEntity.SIN = Witness.SIN) INNER JOIN Location ON Location.LocationID = LegalEntity.LocationID;
