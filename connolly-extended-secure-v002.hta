@@ -71,7 +71,7 @@
 		     
 			  @return (string) The relative file path (directory)
 			 */
-			function formSearchHotel(outputFunction)
+			function formSearchLegalEntity(outputFunction)
 			{
 				// Updates the FormSection with an HTML <FORM> for City Name to use in Search
 				var strHTML = new String();
@@ -96,7 +96,7 @@
 			 
 			  @param (string) strID The section of the HTML page to display the output (e.g. OutputSection).
 			 */
-			function searchHotelSecure(strID)
+			function searchLegalEntitySecure(strID)
 			{
 				// Access 2007 and Later
 				// var strConnection = "Provider=Microsoft.ACE.OLEDB.12.0;Data Source=" + getPath() + "connolly-extended.mdb";
@@ -111,7 +111,7 @@
 				
 				// Create SQL Statement String
 				var strSQL = new String();
-				strSQL = "SELECT * FROM LegalEntity WHERE SSN=[SSNParameter]";
+				strSQL = "SELECT * FROM LegalEntity WHERE SSN=[SSNParameter] ORDER BY Height";
 				
 				// Prepare Parameterized Command
 				var oCommand = new ActiveXObject("ADODB.Command");
@@ -151,7 +151,8 @@
 			 
 			  @param (string) strID The section of the HTML page to display the output (e.g. OutputSection).
 			 */
-			function searchHotelUnsecure(strID)
+			/*	
+			function searchLegalEntityUnsecure(strID)
 			{
 				// Access 2007 and Later
 				// var strConnection = "Provider=Microsoft.ACE.OLEDB.12.0;Data Source=" + getPath() + "connolly-extended.mdb";
@@ -167,7 +168,7 @@
 				// Execute a Read Only Query - Subject To SQL INJECTOR Errors
 				var strSQL = new String();
 				strSQL = "SELECT * FROM LegalEntity WHERE SSN='" +
-					document.forms("SearchLegalEntity").item("SSN").value + "'";
+					document.forms("SearchLegalEntity").item("SSN").value + "' ORDER BY Height";
 				var rsQuery = oConnection.Execute(strSQL);
 				
 				// Generate HTML Table with Query Results
@@ -190,9 +191,10 @@
 				// Conclusions
 				oConnection.Close();
 			}
+			*/
 
-			// showHotel - Output a List of Hotels to Output Window
-			function showHotel(strID)
+			// showLegalEntity - Output a List of LegalEntitys to Output Window
+			function showLegalEntity(strID)
 			{
 				// Access 2007 and Later
 				var strConnection = "Provider=Microsoft.ACE.OLEDB.12.0;Data Source=" + getPath() + "shawjenkins.accdb";
@@ -206,17 +208,15 @@
 				oConnection.Open(strConnection);
 				
 				// Execute a Read Only Query
-				// var rsQuery = oConnection.Execute("SELECT * FROM Hotel ORDER BY hotelName,city");
 				var rsQuery = oConnection.Execute("SELECT * FROM LegalEntity Order By Height;");
-				// var rsQuery = oConnection.Execute("SELECT Style, Color, ModelType, MakeType, Timedate FROM (Incident INNER JOIN VehicleIncident ON Incident.IncidentID = VehicleIncident.IncidentID) INNER JOIN Vehicle ON VehicleIncident.VehicleID = Vehicle.VehicleID");
 				
 				// Generate HTML Table with Query Results
 				var strHTML = new String();
 				strHTML += "<table width=\"100%\">"
 				while (!rsQuery.EOF)
 				{
-					// Note: This Code Adds a Link to Display One Hotel
-					strHTML += "<tr><td><a href=\"#\" onclick=\"showOneHotelSecure(" + rsQuery("SSN") + ");\">" +
+					// Note: This Code Adds a Link to Display One LegalEntity
+					strHTML += "<tr><td><a href=\"#\" onclick=\"showOneLegalEntitySecure(" + rsQuery("SSN") + ");\">" +
 						rsQuery("FirstName") + "</a></td><td>" +
 						rsQuery("LastName") + "</a></td><td>" +
 						rsQuery("Gender") + "</a></td><td>" +
@@ -239,7 +239,7 @@
 			 
 			  @param (string) strHotelNo The unique Hotel Number of one Hotel
 			 */
-			function showOneHotelSecure(strModelType)
+			function showOneLegalEntitySecure(strSSN)
 			{
 				// Access 2007 and Later
 				// var strConnection = "Provider=Microsoft.ACE.OLEDB.12.0;Data Source=" + getPath() + "connolly-extended.mdb";
@@ -254,15 +254,14 @@
 				
 				// Create SQL Statement String
 				var strSQL = new String();
-				// strSQL = "SELECT * FROM Vehicle WHERE ModelType=[IDParameter]ORDER BY Timedate";
-				strSQL = "SELECT * FROM LegalEntity WHERE SIN=[IDParameter]";
+				strSQL = "SELECT * FROM LegalEntity WHERE SSN=[IDParameter] ORDER BY Height";
 				
 				// Prepare Parameterized Command
 				var oCommand = new ActiveXObject("ADODB.Command");
 				oCommand.ActiveConnection = oConnection;
 				oCommand.CommandText = strSQL;
 				var parm1 = oCommand.CreateParameter("IDParameter",200,1,50);
-				parm1.Value = strModelType;
+				parm1.Value = strSSN;
 				oCommand.Parameters.Append(parm1);
 				
 				// Execute Command and Return Resulting Record Set
@@ -275,7 +274,7 @@
 				{
 					strHTML += "<tr><td colspan=\"2\">Person Found!</td></tr>";
 					strHTML += "<tr>"
-					strHTML += "<td>" + "SIN" + "</td>"
+					strHTML += "<td>" + "SSN" + "</td>"
 					strHTML += "<td>" + "FirstName" + "</td>";
 					strHTML += "<td>" + "LastName" + "</td>";
 					strHTML += "<td>" + "Gender" + "</td>";
@@ -283,11 +282,10 @@
 					strHTML += "<td>" + "Height" + "</td>";
 					strHTML += "<td>" + "Race" + "</td>";
 					strHTML += "<td>" + "Phone" + "</td>";
-					strHTML += "<td>" + "SSN" + "</td>";
 					strHTML += "</tr>"
 
 					strHTML += "<tr>"
-					strHTML += "<td>" + rsQuery("SIN") + "</td>"
+					strHTML += "<td>" + rsQuery("SSN") + "</td>"
 					strHTML += "<td>" + rsQuery("FirstName") + "</td>";
 					strHTML += "<td>" + rsQuery("LastName") + "</td>";
 					strHTML += "<td>" + rsQuery("Gender") + "</td>";
@@ -295,7 +293,6 @@
 					strHTML += "<td>" + rsQuery("Height") + "</td>";
 					strHTML += "<td>" + rsQuery("Race") + "</td>";
 					strHTML += "<td>" + rsQuery("Phone") + "</td>";
-					strHTML += "<td>" + rsQuery("SSN") + "</td>";
 					strHTML += "</tr>"
 					rsQuery.MoveNext();
 				}
@@ -319,11 +316,11 @@
 		<h1>ADO Programming Example</h1>
 		<h2>Select an Option</h2>
 		<div id="MenuSection">
-			<a href="#home" onclick="showHotel(&quot;OutputSection&quot;);" >Show List of Peoples</a>
+			<a href="#home" onclick="showLegalEntity(&quot;OutputSection&quot;);" >Show List of Peoples</a>
 			<br/>
-			<a href="#home" onclick="formSearchHotel(&quot;searchHotelUnsecure&quot;);" >Search for a People using SQL Injection Vulnerable Code</a>
+			<!-- <a href="#home" onclick="formSearchLegalEntity(&quot;searchLegalEntityUnsecure&quot;);" >Search for a People using SQL Injection Vulnerable Code</a> -->
 			<br/>
-			<a href="#home" onclick="formSearchHotel(&quot;searchHotelSecure&quot;);" >Search for a People using Secure Code</a>
+			<a href="#home" onclick="formSearchLegalEntity(&quot;searchLegalEntitySecure&quot;);" >Search for People</a>
 		</div>
 		<div id="FormSection">
 		</div>
