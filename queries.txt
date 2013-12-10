@@ -54,3 +54,9 @@ WitnessSummonsQuery
 
 SELECT FirstName, LastName, StreetAddress, ZipCode, City, StateCode
 FROM (Witness INNER JOIN LegalEntity ON LegalEntity.SIN = Witness.SIN) INNER JOIN Location ON Location.LocationID = LegalEntity.LocationID;
+
+
+AllLegalEntityOrderedByHeight
+SELECT *
+FROM LegalEntity
+Order By Height;

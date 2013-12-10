@@ -75,10 +75,10 @@
 			{
 				// Updates the FormSection with an HTML <FORM> for City Name to use in Search
 				var strHTML = new String();
-				strHTML += "<form name=\"SearchHotel\">";
-				strHTML += "<h2>Search for Hotel On City (Secure - Not Vulnerable to SQL Injection)</h2>";
-				strHTML += "<p>City: <input name=\"city\" type=\"text\" width=\"50\"/></p>";
-				strHTML += "<p>Try <em>London</em> (Normal User Input) versus <em>London' OR ''='</em> (SQL Injection Attack)></p>";
+				strHTML += "<form name=\"SearchLegalEntity\">";
+				strHTML += "<h2>Search for LegalEntity On SSN (Secure - Not Vulnerable to SQL Injection)</h2>";
+				strHTML += "<p>SSN: <input name=\"SSN\" type=\"text\" width=\"50\"/></p>";
+				strHTML += "<p>Try the SSN <em>100000000</em> (Normal User Input) versus <em>100000000' OR ''='</em> (SQL Injection Attack)></p>";
 				strHTML += "<input value=\"Search\" type=\"button\" onClick=\"";
 				strHTML += outputFunction;
 				strHTML += "(&quot;OutputSection&quot;);\">";
@@ -99,8 +99,8 @@
 			function searchHotelSecure(strID)
 			{
 				// Access 2007 and Later
-				var strConnection = "Provider=Microsoft.ACE.OLEDB.12.0;Data Source=" + getPath() + "connolly-extended.mdb";
-				// var strConnection = "Provider=Microsoft.ACE.OLEDB.12.0;Data Source=" + getPath() + "shawjenkins.accdb"; //switch
+				// var strConnection = "Provider=Microsoft.ACE.OLEDB.12.0;Data Source=" + getPath() + "connolly-extended.mdb";
+				var strConnection = "Provider=Microsoft.ACE.OLEDB.12.0;Data Source=" + getPath() + "shawjenkins.accdb";
 				
 				// Access 2003 and Earlier
 				// var strConnection = "Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" + getPath() + "connolly-extended.mdb";
@@ -111,14 +111,14 @@
 				
 				// Create SQL Statement String
 				var strSQL = new String();
-				strSQL = "SELECT * FROM Hotel WHERE City=[CityParameter]ORDER BY hotelName";
+				strSQL = "SELECT * FROM LegalEntity WHERE SSN=[SSNParameter]";
 				
 				// Prepare Parameterized Command
 				var oCommand = new ActiveXObject("ADODB.Command");
 				oCommand.ActiveConnection = oConnection;
 				oCommand.CommandText = strSQL;
-				var parm1 = oCommand.CreateParameter("CityParameter",200,1,50);
-				parm1.Value = document.forms("SearchHotel").item("city").value;
+				var parm1 = oCommand.CreateParameter("SSNParameter",200,1,50);
+				parm1.Value = document.forms("SearchLegalEntity").item("SSN").value;
 				oCommand.Parameters.Append(parm1);
 				
 				// Execute Command and Return Resulting Record Set
@@ -129,8 +129,11 @@
 				strHTML += "<table width=\"100%\">"
 				while (!rsQuery.EOF)
 				{
-					strHTML += "<tr><td>" + rsQuery("hotelName") + "</td><td>" +
-						rsQuery("city") + "</td></tr>";
+					strHTML += "<tr>";
+					strHTML += "<td>" + rsQuery("SSN") + "</td>";
+					strHTML += "<td>" + rsQuery("FirstName") + "</td>";
+					strHTML += "<td>" + rsQuery("LastName") + "</td>";
+					strHTML += "</tr>";
 					rsQuery.MoveNext();
 				}
 				strHTML += "</table>";
@@ -151,8 +154,8 @@
 			function searchHotelUnsecure(strID)
 			{
 				// Access 2007 and Later
-				var strConnection = "Provider=Microsoft.ACE.OLEDB.12.0;Data Source=" + getPath() + "connolly-extended.mdb";
-				// var strConnection = "Provider=Microsoft.ACE.OLEDB.12.0;Data Source=" + getPath() + "shawjenkins.mdb"; //switch
+				// var strConnection = "Provider=Microsoft.ACE.OLEDB.12.0;Data Source=" + getPath() + "connolly-extended.mdb";
+				var strConnection = "Provider=Microsoft.ACE.OLEDB.12.0;Data Source=" + getPath() + "shawjenkins.accdb"; //switch
 				
 				// Access 2003 and Earlier
 				// var strConnection = "Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" + getPath() + "connolly-extended.mdb";
@@ -163,8 +166,8 @@
 				
 				// Execute a Read Only Query - Subject To SQL INJECTOR Errors
 				var strSQL = new String();
-				strSQL = "SELECT * FROM Hotel WHERE City='" +
-					document.forms("SearchHotel").item("city").value + "' ORDER BY hotelName";
+				strSQL = "SELECT * FROM LegalEntity WHERE SSN='" +
+					document.forms("SearchLegalEntity").item("SSN").value + "'";
 				var rsQuery = oConnection.Execute(strSQL);
 				
 				// Generate HTML Table with Query Results
@@ -172,8 +175,11 @@
 				strHTML += "<table width=\"100%\">"
 				while (!rsQuery.EOF)
 				{
-					strHTML += "<tr><td>" + rsQuery("hotelName") + "</td><td>" +
-						rsQuery("city") + "</td></tr>";
+					strHTML += "<tr>";
+					strHTML += "<td>" + rsQuery("SSN") + "</td>";
+					strHTML += "<td>" + rsQuery("FirstName") + "</td>";
+					strHTML += "<td>" + rsQuery("LastName") + "</td>";
+					strHTML += "</tr>";
 					rsQuery.MoveNext();
 				}
 				strHTML += "</table>";
@@ -201,7 +207,8 @@
 				
 				// Execute a Read Only Query
 				// var rsQuery = oConnection.Execute("SELECT * FROM Hotel ORDER BY hotelName,city");
-				var rsQuery = oConnection.Execute("SELECT Style, Color, ModelType, MakeType, Timedate FROM (Incident INNER JOIN VehicleIncident ON Incident.IncidentID = VehicleIncident.IncidentID) INNER JOIN Vehicle ON VehicleIncident.VehicleID = Vehicle.VehicleID");
+				var rsQuery = oConnection.Execute("SELECT * FROM LegalEntity Order By Height;");
+				// var rsQuery = oConnection.Execute("SELECT Style, Color, ModelType, MakeType, Timedate FROM (Incident INNER JOIN VehicleIncident ON Incident.IncidentID = VehicleIncident.IncidentID) INNER JOIN Vehicle ON VehicleIncident.VehicleID = Vehicle.VehicleID");
 				
 				// Generate HTML Table with Query Results
 				var strHTML = new String();
@@ -209,12 +216,11 @@
 				while (!rsQuery.EOF)
 				{
 					// Note: This Code Adds a Link to Display One Hotel
-					strHTML += "<tr><td><a href=\"#\" onclick=\"showOneHotelSecure(" + rsQuery("ModelType") + ");\">" +
-						rsQuery("Color") + "</a></td><td>" +
-						rsQuery("Style") + "</a></td><td>" +
-						rsQuery("ModelType") + "</a></td><td>" +
-						rsQuery("MakeType") + "</a></td><td>" +
-						rsQuery("Timedate") + "</td></tr>";
+					strHTML += "<tr><td><a href=\"#\" onclick=\"showOneHotelSecure(" + rsQuery("SSN") + ");\">" +
+						rsQuery("FirstName") + "</a></td><td>" +
+						rsQuery("LastName") + "</a></td><td>" +
+						rsQuery("Gender") + "</a></td><td>" +
+						rsQuery("Height") + "</td></tr>";
 					rsQuery.MoveNext();
 				}
 				strHTML += "</table>";
@@ -249,7 +255,7 @@
 				// Create SQL Statement String
 				var strSQL = new String();
 				// strSQL = "SELECT * FROM Vehicle WHERE ModelType=[IDParameter]ORDER BY Timedate";
-				strSQL = "SELECT * FROM Vehicle WHERE ModelType=[IDParameter]";
+				strSQL = "SELECT * FROM LegalEntity WHERE SIN=[IDParameter]";
 				
 				// Prepare Parameterized Command
 				var oCommand = new ActiveXObject("ADODB.Command");
@@ -267,13 +273,30 @@
 				strHTML += "<table width=\"100%\">"
 				while (!rsQuery.EOF)
 				{
-					strHTML += "<tr><td colspan=\"2\">Vehicle Found!</td></tr>";
-					strHTML += "<tr><td>" + rsQuery("ModelType") + "</td><td>" +
-						rsQuery("Color") + "</td></tr>";
-						rsQuery("Style") + "</td></tr>" +
-						rsQuery("ModelType") + "</td></tr>" +
-						rsQuery("MakeType") + "</td></tr>" +
-						rsQuery("Timedate") + "</td></tr>";
+					strHTML += "<tr><td colspan=\"2\">Person Found!</td></tr>";
+					strHTML += "<tr>"
+					strHTML += "<td>" + "SIN" + "</td>"
+					strHTML += "<td>" + "FirstName" + "</td>";
+					strHTML += "<td>" + "LastName" + "</td>";
+					strHTML += "<td>" + "Gender" + "</td>";
+					strHTML += "<td>" + "Weight" + "</td>";
+					strHTML += "<td>" + "Height" + "</td>";
+					strHTML += "<td>" + "Race" + "</td>";
+					strHTML += "<td>" + "Phone" + "</td>";
+					strHTML += "<td>" + "SSN" + "</td>";
+					strHTML += "</tr>"
+
+					strHTML += "<tr>"
+					strHTML += "<td>" + rsQuery("SIN") + "</td>"
+					strHTML += "<td>" + rsQuery("FirstName") + "</td>";
+					strHTML += "<td>" + rsQuery("LastName") + "</td>";
+					strHTML += "<td>" + rsQuery("Gender") + "</td>";
+					strHTML += "<td>" + rsQuery("Weight") + "</td>";
+					strHTML += "<td>" + rsQuery("Height") + "</td>";
+					strHTML += "<td>" + rsQuery("Race") + "</td>";
+					strHTML += "<td>" + rsQuery("Phone") + "</td>";
+					strHTML += "<td>" + rsQuery("SSN") + "</td>";
+					strHTML += "</tr>"
 					rsQuery.MoveNext();
 				}
 				strHTML += "</table>";
@@ -296,11 +319,11 @@
 		<h1>ADO Programming Example</h1>
 		<h2>Select an Option</h2>
 		<div id="MenuSection">
-			<a href="#home" onclick="showHotel(&quot;OutputSection&quot;);" >Show List of Hotels</a>
+			<a href="#home" onclick="showHotel(&quot;OutputSection&quot;);" >Show List of Peoples</a>
 			<br/>
-			<a href="#home" onclick="formSearchHotel(&quot;searchHotelUnsecure&quot;);" >Search for a Hotel using SQL Injection Vulnerable Code</a>
+			<a href="#home" onclick="formSearchHotel(&quot;searchHotelUnsecure&quot;);" >Search for a People using SQL Injection Vulnerable Code</a>
 			<br/>
-			<a href="#home" onclick="formSearchHotel(&quot;searchHotelSecure&quot;);" >Search for a Hotel using Secure Code</a>
+			<a href="#home" onclick="formSearchHotel(&quot;searchHotelSecure&quot;);" >Search for a People using Secure Code</a>
 		</div>
 		<div id="FormSection">
 		</div>
